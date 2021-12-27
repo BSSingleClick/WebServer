@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <title>Downloading Map...</title>
+
+        <style>
+            body{
+                background: rgb(44, 44, 44);
+                color: rgb(151, 239, 255);
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            #status{
+                position: fixed;
+                left: 50%;
+                top: 25%;
+                transform: translate(-50%, -50%);
+                border-right: rgb(151, 239, 255) 3px solid;
+                padding-right: 10px;
+                text-align: right;
+                animation: 2s fadeInOut infinite linear;
+            }
+
+            @keyframes fadeInOut{
+                0%{
+                    border-right: rgba(151, 239, 255, 1) 3px solid;
+                }
+                50%{
+                    border-right: rgba(151, 239, 255, 0) 3px solid;
+                }
+                100%{
+                    border-right: rgba(151, 239, 255, 1) 3px solid;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="status"></div>
+
+        <script>
+            let status = document.getElementById('status');
+
+            fetch('https://api.beatsaver.com/maps/id/<%= id %>').then(data => data.json()).then(data => {
+                if(data.error){
+                    status.innerHTML = '<span style="font-size: 35px;">'+data.error+'</span><br />Sorry, I cannot find that song.'
+                } else{
+                    fetch('http://localhost:8679/dwn/<%= id %>').then(data => data.json()).then(data => {
+                        if(data.error){
+                            status.innerHTML = '<span style="font-size: 35px;">Oops</span><br />Something has gone wrong with your client, try updating to the latest version'
+                        } else{
+                            status.innerHTML = '<span style="font-size: 35px;">Downloading</span><br />Your client should popup a comfirmation window shortly'
+                        }
+                    }).catch(e => {
+                        status.innerHTML = '<span style="font-size: 35px;">Oops</span><br />Your client doesn\'t seem to be running, try starting it manually'
+                    })
+                }
+            }).catch(e => {
+                status.innerHTML = '<span style="font-size: 35px;">404 Not Found</span><br />Sorry, I cannot find that song.'
+            })
+        </script>
+    </body>
+</html>
